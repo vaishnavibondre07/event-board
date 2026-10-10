@@ -1,4 +1,3 @@
-// const { test, before, after } = require('node:test');
 const { test, before, after } = require("node:test");
 const assert = require("node:assert");
 const fs = require("fs");
@@ -8,16 +7,13 @@ const app = require("../src/server");
 let server;
 let baseUrl;
 let dbBackup;
-
 const dbPath = path.join(__dirname, "..", "data", "events.json");
 
 before(() => {
   if (fs.existsSync(dbPath)) {
-    dbBackup = fs.readFileSync(dbPath, "utf-8");
+    dbBackup = fs.readFileSync(dbPath, 'utf-8');
   }
-
   process.env.ADMIN_TOKEN = "test-token";
-
   return new Promise((resolve) => {
     server = app.listen(0, () => {
       baseUrl = `http://localhost:${server.address().port}`;
@@ -28,22 +24,19 @@ before(() => {
 
 after(() => {
   if (dbBackup !== undefined) {
-    fs.writeFileSync(dbPath, dbBackup, "utf-8");
+    fs.writeFileSync(dbPath, dbBackup, 'utf-8');
   } else {
     if (fs.existsSync(dbPath)) {
       fs.unlinkSync(dbPath);
     }
   }
-
   server.close();
 });
 
 // GET all events
 test("GET /events returns events array", async () => {
   const res = await fetch(`${baseUrl}/events`);
-
   assert.strictEqual(res.status, 200);
-
   const data = await res.json();
   assert.ok(Array.isArray(data));
 });
@@ -56,15 +49,12 @@ test("POST /events creates a new event", async () => {
     location: "Online",
     tags: ["test"]
   };
-
   const res = await fetch(`${baseUrl}/events`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
-
   assert.strictEqual(res.status, 201);
-
   const data = await res.json();
   assert.strictEqual(data.title, "Test Event");
 });
@@ -80,7 +70,6 @@ test("PUT /events/:id without token returns 401", async () => {
       location: "Here"
     })
   });
-
   assert.strictEqual(res.status, 401);
 });
 
@@ -95,7 +84,6 @@ test("PUT /events/:id with valid token updates event", async () => {
       location: "Here"
     })
   });
-
   const ev = await postRes.json();
 
   const res = await fetch(`${baseUrl}/events/${ev.id}`, {
@@ -110,9 +98,7 @@ test("PUT /events/:id with valid token updates event", async () => {
       location: "Here"
     })
   });
-
   assert.strictEqual(res.status, 200);
-
   const data = await res.json();
   assert.strictEqual(data.title, "New Title");
 });
@@ -122,7 +108,6 @@ test("DELETE /events/:id without token returns 401", async () => {
   const res = await fetch(`${baseUrl}/events/1`, {
     method: "DELETE"
   });
-
   assert.strictEqual(res.status, 401);
 });
 
@@ -137,16 +122,13 @@ test("DELETE /events/:id with valid token deletes event", async () => {
       location: "Here"
     })
   });
-
   const ev = await postRes.json();
-
   const res = await fetch(`${baseUrl}/events/${ev.id}`, {
     method: "DELETE",
     headers: {
       "Authorization": "Bearer test-token"
     }
   });
-
   assert.strictEqual(res.status, 200);
 });
 
@@ -154,7 +136,6 @@ test("DELETE /events/:id with valid token deletes event", async () => {
 test("POST /events returns 500 and does not add event when saving fails", async () => {
   const beforeRes = await fetch(`${baseUrl}/events`);
   const beforeEvents = await beforeRes.json();
-
   const originalWriteFileSync = fs.writeFileSync;
   const originalConsoleError = console.error;
 
