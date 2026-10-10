@@ -34,6 +34,7 @@ function saveEvents(updatedEvents) {
     "utf-8"
   );
 }
+
 loadEvents();
 
 // GET all events
