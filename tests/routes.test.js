@@ -103,9 +103,10 @@ test('DELETE /events/:id with valid token deletes event', async () => {
     body: JSON.stringify({ title: "ToDelete", date: "2026-11-01", location: "Here" })
   });
   const ev = await postRes.json();
+
   const res = await fetch(`${baseUrl}/events/${ev.id}`, {
     method: "DELETE",
-    headers: { "Authorization": "Bearer test-token" }
+    headers: { "Authorization": "Bearer test-token" } 
   });
   assert.strictEqual(res.status, 200);
 });
